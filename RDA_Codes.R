@@ -15,7 +15,9 @@ class(dat)
 dat <- as.data.frame(dat)
 colnames(dat)
 summary(dat)
-#Log Transform non-climate predictor variables of fish community composition that are not normally distributed
+
+##Load data and log-transform environmental variables that violate statistical assumptions
+###Write a loop to log transform the necessary variables
 lakedat <- cbind(dat[4:9])
 for (i in 1:6){
     lakedat[i] <- log10(lakedat[i]+1) 
