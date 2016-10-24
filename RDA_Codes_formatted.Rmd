@@ -1,0 +1,76 @@
+---
+title: "RDA_Codes_formatted"
+author: "Thomas Van Zuiden"
+date: "October 24, 2016"
+output: html_document
+---
+
+##Loading libraries
+``` {r}
+library(ade4)
+library(vegan)
+library(MASS)
+install.packages("packfor", repos="http://R-Forge.R-project.org")
+library(packfor)
+```
+
+##Load data and log-transform environmental variables that violate statistical assumptions
+``` {r}
+setwd("C:\\Users\\adminuser\\Desktop\\EVERYTHING THOMAS\\Chapter 2")
+dat<-read.csv("rda.csv")
+dat<-na.omit(dat)
+nrow(dat)
+class(dat)
+dat <- as.data.frame(dat)
+colnames(dat)
+```
+
+###Write a loop to log-transform the necessary variables
+```{r}
+lakedat <- cbind(dat[4:9])
+for (i in 1:6){
+    lakedat[i] <- log10(lakedat[i]+1) 
+}
+climdat <- cbind(dat[10:19])
+fishdat <- cbind(dat[20:29])
+envdat <- data.frame(lakedat, climdat)
+```
+## Hellinger-transform species data and standardize environmental variables
+``` {r}
+spe.hel=decostand(fishdat, "hellinger") ### Hellinger transform species data
+env.std=decostand(envdat, "standardize") ### Standardize environmental data
+```
+
+## Trying out an RDA with all explanatory variables in the data
+### It's going to be messy
+``` {r}
+fishRDA=rda(spe.hel ~ ., data=env.std)
+R2adjusted=RsquareAdj(fishRDA)$adj.r.squared
+R2adjusted
+plot(fishRDA)
+text(fishRDA, display = "species", cex=0.8, col="red")
+```
+
+## Cleaning the RDA to eliminate redundant constraints
+``` {r}
+#Forward selection will indicate important explanatory variables
+forward.sel(spe.hel, env.std)
+
+#Recreating a cleaner RDA with only important predictors of fish communities
+fishRDA=rda(spe.hel ~Surface_Area_ha+Secchi_Depth_m+July_0012_temp+July_0012_pre+DOC_mgL+P_ugL, data=env.std)
+
+#Global adjusted R2
+R2adjusted=RsquareAdj(fishRDA)$adj.r.squared
+R2adjusted
+
+#Assessing multicollinearity between explanatory varables
+vif.cca(fishRDA) ## values over 10 indicate redundant constraints
+
+#Plot RDA with only significant variables
+plot(fishRDA)
+text(fishRDA, display = "species", cex=0.8, col="red")
+anova.cca(fishRDA, step=1000)
+```
+
+
+
