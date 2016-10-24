@@ -35,6 +35,7 @@ climdat <- cbind(dat[10:19])
 fishdat <- cbind(dat[20:29])
 envdat <- data.frame(lakedat, climdat)
 ```
+
 ## Hellinger-transform species data and standardize environmental variables
 ``` {r}
 spe.hel=decostand(fishdat, "hellinger") ### Hellinger transform species data
@@ -57,7 +58,7 @@ text(fishRDA, display = "species", cex=0.8, col="red")
 forward.sel(spe.hel, env.std)
 
 #Recreating a cleaner RDA with only important predictors of fish communities
-fishRDA=rda(spe.hel ~Surface_Area_ha+Secchi_Depth_m+July_0012_temp+July_0012_pre+DOC_mgL+P_ugL, data=env.std)
+fishRDA=rda(spe.hel ~Surface_Area_ha+Secchi_Depth_m+July_0012_temp+July_0012_prec+DOC_mgL+P_ugL, data=env.std)
 
 #Global adjusted R2
 R2adjusted=RsquareAdj(fishRDA)$adj.r.squared
